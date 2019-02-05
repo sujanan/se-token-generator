@@ -132,7 +132,6 @@ class OauthFlowHandler(object):
         client.close()
 
         query_params = self.step3_config.param_values(query_params)
-        print(query_params)
         r = requests.post(
             self.step3_config.endpoint,
             data=query_params,

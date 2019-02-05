@@ -1,0 +1,6 @@
+StackExchange OAuth2 Access Token Generator
+===========================================
+
+se-token-generator.py automates StackExchange
+API OAuth2.0 access token generation explicit
+flow with 'localhost' as the domain.
