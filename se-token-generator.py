@@ -163,26 +163,37 @@ class OauthFlowHandler(object):
         return header
 
 
-SETP1 = Config("https://stackoverflow.com/oauth", HttpVerb.GET, [
-    NoChoiceParam("client_id"),
-    DefaultValueParam("redirect_uri", "http://localhost:3001/stackapp"),
-    ChoiceParam("scope",
-                ["read_inbox", "no_expiry", "write_access", "private_info"])
-])
+SETP1 = Config(
+    endpoint="https://stackoverflow.com/oauth",
+    http_verb=HttpVerb.GET,
+    params=[
+        NoChoiceParam("client_id"),
+        DefaultValueParam("redirect_uri", "http://localhost:3001/stackapp"),
+        ChoiceParam(
+            "scope",
+            ["read_inbox", "no_expiry", "write_access", "private_info"])
+    ])
 
-SETP2 = Config("localhost:3001/stackapp", HttpVerb.GET,
-               [NoChoiceParam("code")])
+SETP2 = Config(
+    endpoint="localhost:3001/stackapp",
+    http_verb=HttpVerb.GET,
+    params=[NoChoiceParam("code")])
 
-SETP3 = Config("https://stackoverflow.com/oauth/access_token", HttpVerb.POST, [
-    NoChoiceParam("client_id"),
-    NoChoiceParam("client_secret"),
-    NoChoiceParam("code"),
-    NoChoiceParam("redirect_uri")
-])
+SETP3 = Config(
+    endpoint="https://stackoverflow.com/oauth/access_token",
+    http_verb=HttpVerb.POST,
+    params=[
+        NoChoiceParam("client_id"),
+        NoChoiceParam("client_secret"),
+        NoChoiceParam("code"),
+        NoChoiceParam("redirect_uri")
+    ])
 
 INVALIDATE = Config(
+    endpoint=
     "https://api.stackexchange.com/2.2/access-tokens/{accessTokens}/invalidate",
-    HttpVerb.GET, [NoChoiceParam("accessTokens")])
+    http_verb=HttpVerb.GET,
+    params=[NoChoiceParam("accessTokens")])
 
 
 def opt_invalidate():
