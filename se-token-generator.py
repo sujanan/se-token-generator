@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 import socket
 import signal
@@ -5,6 +7,17 @@ import requests
 import threading
 import webbrowser
 from abc import ABCMeta, abstractmethod
+
+
+class CmdOpt(object):
+    def __init__(self, opt, long_opt, callback):
+        self.opt = opt
+        self.long_opt = long_opt
+        self.callback = callback
+
+    def run(self, cmd):
+        if cmd == self.opt or cmd == self.long_opt:
+            self.callback()
 
 
 class HttpVerb:
@@ -167,6 +180,26 @@ SETP3 = Config("https://stackoverflow.com/oauth/access_token", HttpVerb.POST, [
     NoChoiceParam("redirect_uri")
 ])
 
+INVALIDATE = Config(
+    "https://api.stackexchange.com/2.2/access-tokens/{accessTokens}/invalidate",
+    HttpVerb.GET, [NoChoiceParam("accessTokens")])
+
+
+def opt_invalidate():
+    accessTokens = INVALIDATE.param_values().get("accessTokens")
+    r = requests.get(INVALIDATE.endpoint.format(accessTokens=accessTokens))
+    print(r.text)
+
+
+def opt_deauthenticate():
+    pass
+
+
+CMD_OPT = [
+    CmdOpt(opt="-i", long_opt="--invalidate", callback=opt_invalidate),
+    CmdOpt(opt="-d", long_opt="--deauthenticate", callback=opt_deauthenticate)
+]
+
 oauthFlowHandler = OauthFlowHandler(SETP1, SETP2, SETP3)
 
 
@@ -176,5 +209,9 @@ def shutdownHandler(sig, unused):
 
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGINT, shutdownHandler)
-    oauthFlowHandler.start()
+    if len(sys.argv) == 2:
+        for opt in CMD_OPT:
+            opt.run(sys.argv[1])
+    else:
+        signal.signal(signal.SIGINT, shutdownHandler)
+        oauthFlowHandler.start()
